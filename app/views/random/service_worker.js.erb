@@ -4,9 +4,25 @@ console.info("Service Worker Startup")
 const MASTER = 1
 const SLAVE  = 0
 
+const cacheVersion = 'v4'
+const preCacheFiles = [
+  "<%= asset_path('application.js') %>",
+  "<%= asset_path('application.css') %>",
+  "https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.10.8/xlsx.full.min.js"
+]
+
 self.addEventListener('install', event => {
   console.info('installing service worker')
-  event.waitUntil(self.skipWaiting())
+  event.waitUntil(
+    caches.open(cacheVersion).then(function(cache) {
+      console.info("pre-caching cache-list: ")
+      console.info(preCacheFiles)
+      return cache.addAll(preCacheFiles)
+    }).then(function() {
+      console.info('service worker installed')
+      return self.skipWaiting()
+    })
+  )
 })
 
 self.addEventListener('activate', function(event){
@@ -49,3 +65,35 @@ function send_message_to_client(client, msg){
   })
 }
 
+
+self.addEventListener('fetch', event => {
+  console.info("fetching " + event.request.url)
+  if(event.request.method !== 'GET'){
+    console.info("only get requests supported")
+    return
+  }
+  if(event.request.url.match("faye")){
+    console.info("using default behavior for " + event.request.url)
+    return
+  }
+  event.respondWith(
+    caches.match(event.request).then(function(resp) {
+      if(resp){
+        console.info("cached response for: " + event.request.url)
+        return resp
+      }
+      else{
+        console.info("not cached for: " + event.request.url)
+        return resp || fetch(event.request).then(function(response) {
+          let r2 = response.clone()
+          caches.open(cacheVersion).then(function(cache) {
+            cache.put(event.request, r2)
+          })
+          return response
+        })
+      }
+    }).catch(function(error) {
+      console.info(error)
+    })
+  )}
+)
