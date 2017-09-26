@@ -1,0 +1,66 @@
+<div class="reveal">
+  <div class="slides">
+    <section>
+      <h2>Service Workers and Rails</h2>
+      <p>Nathan Jenkins</p>
+    </section>
+
+    <section>
+      <h2>Motivation</h2>
+      <ul>
+        <li>
+          Authorea is a large rails app with a react/redux front-end.
+        </li>
+        <li>
+          Needed a way to send messages between windows opened on the same article
+        </li>
+        <li>
+          Doing so via localStorage is cumbersome
+        </li>
+        <li>
+          Didn't realize offline support comes almost for free
+        </li>
+      </ul>
+    </section>
+    <section>
+      <h2>What is a service worker?</h2>
+      <img src="assets/service-worker.svg" width="1000" style="border: 4;">
+      <a href="https://coryrylan.com/blog/fast-offline-angular-apps-with-service-workers">coryrylan.com/blog/fast-offline-angular-apps-with-service-workers</a>
+    </section>
+    <section>
+      <h2>Caveats</h2>
+      <ul>
+        <li>
+          https only
+        </li>
+        <li>
+          Can be tricky to debug
+        </li>
+        <li>
+          Installation isn't as straightforward as it could be
+        </li>
+      </ul>
+      <br>
+      <blockquote>
+        There are only two hard things in Computer Science: cache invalidation and naming things.
+
+        -- Phil Karlton
+      </blockquote>
+    </section>
+    <section>
+      <h2>Integrating with Rails</h2>
+      <ul>
+        <li>
+          endpoint gives scope, so don't install in asset pipeline
+        </li>
+        <li>
+          cache expiration strategy - assets with or without cache digest
+        </li>
+      </ul>
+    </section>
+  </div>
+</div>
+
+<script>
+  Reveal.initialize();
+</script>

@@ -71,7 +71,7 @@ self.addEventListener('fetch', event => {
     console.info("only get requests supported")
     return
   }
-  if(event.request.url.match("faye")){
+  if(event.request.url.match("slides")){
     console.info("using default behavior for " + event.request.url)
     return
   }
