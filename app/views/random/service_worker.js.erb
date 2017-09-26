@@ -67,7 +67,6 @@ function send_message_to_client(client, msg){
 
 
 self.addEventListener('fetch', event => {
-  console.info("fetching " + event.request.url)
   if(event.request.method !== 'GET'){
     console.info("only get requests supported")
     return
