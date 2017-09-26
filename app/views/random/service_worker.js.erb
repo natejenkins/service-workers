@@ -1,0 +1,51 @@
+// adapted from http://craig-russell.co.uk/2016/01/29/service-worker-messaging.html#.WaQ7jXUjH0o
+console.info("Service Worker Startup")
+
+const MASTER = 1
+const SLAVE  = 0
+
+self.addEventListener('install', event => {
+  console.info('installing service worker')
+  event.waitUntil(self.skipWaiting())
+})
+
+self.addEventListener('activate', function(event){
+  console.info('activated!')
+  event.waitUntil(clients.claim())
+})
+
+self.addEventListener('message', function(event){
+  console.info("Service Worker Received Message:");
+  console.info(event.data)
+  switch(event.data.action){
+    case 'CLAIM_MASTER_TAB':
+    case 'REJECT_MASTER_TAB':
+      send_message_to_all_clients({action: 'SET_TAB_STATUS', status: SLAVE}, {excludeClientIds: [event.source.id]})
+      break
+    default:
+      send_message_to_all_clients(event.data, {excludeClientIds: [event.source.id]})
+      break
+  }
+});
+
+function send_message_to_all_clients(msg, options){
+  let defaultOptions = {
+    excludeClientIds: []
+  }
+  options = Object.assign({}, defaultOptions, options)
+  clients.matchAll().then(clients => {
+    clients.forEach(client => {
+      if(options["excludeClientIds"].indexOf(client.id) < 0){
+        send_message_to_client(client, msg)
+      }
+    })
+  })
+}
+
+function send_message_to_client(client, msg){
+  return new Promise(function(resolve, reject){
+    var msg_chan = new MessageChannel();
+    client.postMessage(msg, [msg_chan.port2])
+  })
+}
+

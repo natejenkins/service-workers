@@ -1,0 +1,13 @@
+.circle
+{
+  width: 100px;
+  height:100px;
+  bordeR: 1px solid;
+  border-radius: 50%;
+  background-color: red;
+}
+
+.circle.master{
+  background-color: green;
+}
+
